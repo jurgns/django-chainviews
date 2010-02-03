@@ -1,62 +1,56 @@
-from django.db.models import Model
-from django.db.models.query import QuerySet
 from django.http import HttpResponse
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, _get_queryset
 
-def model_base(qs, key='qs'):
-    def _model_base(request, c):
-        if isinstance(qs, Model):
-            c[key] = qs.objects.all()
-        elif isinstance(qs, QuerySet):
-            c[key] = qs
-        else:
-            raise Exception
-        return c
-    return _model_base
+def detail(fields, template_var='fields'):
+    def _detail(request, c):
+        c[template_var] = fields
+        return request, c
+    return _detail
 
-def filter(fields, qs='qs', query_key='q'):
-    def _filter(request, c):
-        pass
-    return _filter
+def list(fields, template_var='fields'):
+    def _list(request, c):
+        c[template_var] = fields
+    return _list
 
-def get_object(qs='qs', key='id', pk='pk', template_object_name='obj'):
+def get_object(Model, request_key='id', model_pk='pk', template_object_name='obj'):
     def _get_object(request, c):
-        # qs can be one of the following: Model, query, key for qs in vars
-        if isinstance(qs, (Model, QuerySet)):
-            d = {pk: c[key]}
-            c[template_object_name] = get_object_or_404(qs, **d)
-        elif isinstance(qs, str):
-            c[template_object_name] = c[qs]
-        else:
-            raise Exception
-        d = {c[field]: key}
+        qs = _get_queryset(Model)
+        d = {model_pk: c[request_key]}
         c[template_object_name] = qs.get(**d)
-        return c
+        return request, c
     return _get_object
 
-def edit(Form, key='obj', method='POST'):
+def get_list(Model, template_qs_name='qs'):
+    def _get_list(request, c):
+        qs = _get_queryset(Model)
+        c[template_qs_name] = qs
+        return request, c
+    return _get_list
+
+def edit(Form, template_form_name='edit_form', template_obj_name='obj', method='POST'):
     def _edit(request, c):
-        edit_form = Form(request.__getattribute__(method) or None, instance=c[key])
+        edit_form = Form(request.__getattribute__(method) or None, instance=c[template_obj_name])
         if edit_form.is_valid():
-            c[key] = edit_form.save()
+            c[template] = edit_form.save()
             # redirect?
-        return c 
+        return request, c 
 
 def template(template_path):
     def _template(request, c):
         c['template_path'] = template_path
-        return c
+        return request, c
     return _template
 
 def render(request, c):
-    return render_to_response(c['template_path'], c)
+    return request, render_to_response(c['template_path'], c)
 
 def chain_view(*partials):
-    def _chain(request, **kwargs):
+    def _chain_view(request, **kwargs):
         r, c = request, kwargs
         for partial in partials:
             r, c = partial(r, c)
             if isinstance(c, HttpResponse):
                 return c
         return c 
-        
+    return _chain_view
+
