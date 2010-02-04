@@ -1,0 +1,8 @@
+============
+Installation
+============
+
+python setup.py install
+
+Adding 'chainviews' to installed apps is optional but highly recommended as a best practice. 
+
