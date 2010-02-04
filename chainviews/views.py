@@ -1,15 +1,18 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404, _get_queryset
 
-def if_(condition, action):
+def if_(condition, action, else_action=None):
     """
-    Executes ``action`` on based on ``condition``.
+    Executes ``action`` on based on ``condition``. Optional ``else_action`` will be evaluated on 
+    ``condition`` failure.
 
-    Both ``action`` and ``condition`` should be callables of the form f(request, c).
+    Both ``action``, ``condition`` and ``else_action`` should be callables of the form f(request, c).
     """
     def _if_(request, c):
         if condition(request, c):
             return action(request, c)
+        elif else_action:
+            return else_action(request, c)
         return request, c
 
 def get_object(Model, request_key='id', model_pk='pk', template_object_name='obj'):
