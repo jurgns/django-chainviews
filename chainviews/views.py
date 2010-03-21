@@ -21,7 +21,7 @@ def if_(condition, action, else_action=None):
             return else_action(request, c)
         return request, c
 
-def get_object(Model, query_keys={'id': 'pk'}, template_object_name='obj'):
+def get_object(Model, query_keys={'pk': 'id'}, template_object_name='obj'):
     """
     Retrieves and object from the database and places it in the context.
 
