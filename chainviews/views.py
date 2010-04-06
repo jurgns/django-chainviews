@@ -72,6 +72,20 @@ def get_qs(Model, query_keys={}, template_qs_name='qs'):
         return request, c
     return _get_qs
 
+def filter_qs(query_keys, template_qs_name='qs'):
+    """
+    """
+    def _filter_qs(request, c):
+        # function to fetch request key from context
+        _fetch = lambda kvpair: (kvpair[0], c[kvpair[1]])
+        # map _fetch onto query_keys and return to dictionary
+        keys = map(_fetch, query_keys.items())
+        keys = dict(keys)
+        # filter
+        c[template_qs_name] = c[template_qs_name].filter(**keys)
+        return request, c
+    return _filter_qs 
+
 def edit(Form, template_form_name='edit_form', template_obj_name='obj', method='POST'):
     """
     *** not done yet ***
