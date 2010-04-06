@@ -18,7 +18,7 @@ def if_(condition, then_partial=do_nothing, else_partial=do_nothing):
         return else_partial(request, c)
     return _if_
 
-def get_object(Model, query_keys={'pk': 'id'}, template_object_name='obj'):
+def get_object(Model, query_keys={}, template_object_name='obj'):
     """
     Retrieves and object from the database and places it in the context.
 
@@ -28,6 +28,15 @@ def get_object(Model, query_keys={'pk': 'id'}, template_object_name='obj'):
     resulting object will be placed in the context variable ``template_object_name``. An object 
     not found based on criteria will result in server 404.
     """
+    # grab the metaclass
+    if hasattr(Model, '_meta'):
+        meta = Model._meta
+    elif hasattr(Model, 'model'):
+        meta = Model.model._meta
+    else:
+        raise Exception
+    if not query_keys:
+        query_keys = {'pk': "%s_id" % meta.object_name.lower()}
     def _get_object(request, c):
         # function to fetch request key from context
         _fetch = lambda kvpair: (kvpair[0], c[kvpair[1]])
