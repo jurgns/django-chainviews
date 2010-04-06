@@ -7,19 +7,21 @@ def _get_parent_query_keys(keys):
             query_keys = ["%s__%s" % (key, k) for k in query_keys] + [key,]
     return query_keys
 
-def if_(condition, action, else_action=None):
     """
-    Executes ``action`` on based on ``condition``. Optional ``else_action`` will be evaluated on 
-    ``condition`` failure.
 
-    Both ``action``, ``condition`` and ``else_action`` should be callables of the form f(request, c).
+def if_(condition, then_partial=do_nothing, else_partial=do_nothing):
+    """
+    Executes ``then_partial`` on based on ``condition``. Optional ``else_partial`` will be evaluated
+    on ``condition`` failure.
+
+    ``condition`` is a condition in the form f(request, c) -> bool.
+    ``then_partial`` and ``else_partial`` should both be partials of the form f(request, c) -> (request, c).
     """
     def _if_(request, c):
         if condition(request, c):
-            return action(request, c)
-        elif else_action:
-            return else_action(request, c)
-        return request, c
+            return then_partial(request, c)
+        return else_partial(request, c)
+    return _if_
 
 def get_object(Model, query_keys={'pk': 'id'}, template_object_name='obj'):
     """
