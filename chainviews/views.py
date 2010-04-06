@@ -1,8 +1,38 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404, _get_queryset
 
+####################################################################################################
+##### Conditions ###################################################################################
 
+def get_session_key(key):
     """
+    """
+    def _get_session_key(request, c):
+        if key in request.session:
+            return request.session[key]
+        return None
+    return _get_session_key
+
+def get_request_key(key, method='GET'):
+    """
+    """
+    def _get_request_key(request, c):
+        return request.__getattribute__(method).get(key, False)
+    return _get_request_key
+
+####################################################################################################
+##### Partials #####################################################################################
+
+def set_session_key(key, value):
+    def _set_session_key(request, c):
+        request.session[key] = value
+        return request, c
+    return _set_session_key
+
+def do_nothing(request, c):
+    """
+    """
+    return request, c
 
 def if_(condition, then_partial=do_nothing, else_partial=do_nothing):
     """
