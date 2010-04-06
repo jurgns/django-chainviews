@@ -1,11 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404, _get_queryset
 
-def _get_parent_query_keys(keys):
-    query_keys = []
-    for key in keys:
-            query_keys = ["%s__%s" % (key, k) for k in query_keys] + [key,]
-    return query_keys
 
     """
 
