@@ -107,6 +107,17 @@ def render(request, c):
     """
     return request, render_to_response(c['template_path'], c)
 
+def chain_partial(*partials):
+    """
+    Simple container for partials, usefull when combinding several partials into a single contained
+    unit (partial).
+    """
+    def _chain_partial(request, c):
+        for partial in partials:
+            request, c = partial(request, c)
+        return request, c
+    return _chain_partial
+
 def chain_view(*partials):
     """
     Enables views to be created in a 'chain' fasion.
