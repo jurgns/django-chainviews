@@ -20,6 +20,15 @@ def get_request_key(key, method='GET'):
         return request.__getattribute__(method).get(key, None)
     return _get_request_key
 
+def get_context_key(key):
+    """
+    """
+    def _get_context_key(request, c):
+        if key not in c:
+            return
+        return c[key]
+    return _get_context_key
+
 ####################################################################################################
 ##### Partials #####################################################################################
 
