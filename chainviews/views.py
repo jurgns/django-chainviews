@@ -29,6 +29,33 @@ def get_context_key(key):
         return c[key]
     return _get_context_key
 
+def or_(*conditions):
+    """
+    """
+    def _or_(request, c):
+        for condition in conditions:
+            value = (callable(condition) and condition(request, c)) or condition
+            if value:
+                return value
+    return _or_
+
+def and_(*conditions):
+    """
+    """
+    def _and_(request, c):
+        for condition in conditions:
+            value = (callable(condition) and condition(request, c)) or condition
+            if not value:
+                return value
+    return _and_
+
+def not_(condition):
+    """
+    """
+    def _not_(request, c):
+        return not ((callable(condition) and condition(request, c)) or condition)
+    return _not_
+
 ####################################################################################################
 ##### Partials #####################################################################################
 
