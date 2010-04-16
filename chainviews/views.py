@@ -198,6 +198,8 @@ def chain_partial(*partials):
     Simple container for partials, usefull when combinding several partials into a single contained
     unit (partial).
     """
+    # fail fast if any partial generators do not return a function
+    assert None not in partials
     def _chain_partial(request, c):
         for partial in partials:
             request, c = partial(request, c)
@@ -214,6 +216,8 @@ def chain_view(*partials):
     the chain going. It is also expected that the final ``partial`` will return a response suitable
     for the client in place of ``c``.
     """
+    # fail fast if any partial generators do not return a function
+    assert None not in partials
     def _chain_view(request, **kwargs):
         r, c = request, kwargs
         for partial in partials:
