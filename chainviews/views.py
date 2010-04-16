@@ -8,16 +8,16 @@ def get_session_key(key):
     """
     """
     def _get_session_key(request, c):
-        if key in request.session:
-            return request.session[key]
-        return None
+        if key not in request.session:
+            return
+        return request.session[key]
     return _get_session_key
 
 def get_request_key(key, method='GET'):
     """
     """
     def _get_request_key(request, c):
-        return request.__getattribute__(method).get(key, False)
+        return request.__getattribute__(method).get(key, None)
     return _get_request_key
 
 ####################################################################################################
